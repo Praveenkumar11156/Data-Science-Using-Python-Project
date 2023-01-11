@@ -1,0 +1,230 @@
+---
+title: "stat Project"
+author: "Praveen Kumar"
+date: "02/05/2022"
+output: html_document
+---
+```{r}
+library(ggplot2)
+library(metan)
+library(dplyr)
+library(ggcorrplot)
+library(corrplot)
+```
+
+Now a  days highly common travelling with airlines companies and since it is common.
+Customer satisfication is one of the most important deciding factor.
+
+
+```{r}
+plane <- read.csv(file.choose(),header=TRUE)
+```
+
+                                      Problem Definition
+                                      
+        Customer satisfaction survey we can predict the most essential feature that leads to satisfied customer they are seat comfort     checkin service etc....
+        Then, we can predict the rating of the passenger we can predict which featured are important and which should be improved..
+        
+        
+                                      General information about the Datasset 
+                                      
+        This dataset is US Airline passenger satisfaction survey
+        Dataset is obtained from kaggle 
+        there are 24 features and 129880 observations
+        There are two classes called "satisfied" and "Netural/ Dissatisfied"
+        
+        
+        Key variables
+            Satisfaction
+            grnder
+            age
+            customer type
+            travel time
+            flight distance
+```{r}
+head(plane)
+```
+
+```{r}
+tail(plane)
+```
+
+```{r}
+dim(plane)
+```
+
+```{r}
+colnames(plane)
+```
+
+```{r}
+summary(plane)
+```
+```{r}
+sum(is.na(plane))
+```
+
+```{r}
+sapply(plane,function(X) sum(is.na(X)))
+```
+
+```{r}
+hist(plane$Arrival.Delay, xlab = "A journey makes lately", col= "blue",main = "Arrival delay",xlim = c(0,400), breaks = 50 )
+```
+
+```{r}
+plane$Arrival.Delay[is.na(plane$Arrival.Delay)] <- median(plane$Arrival.Delay, na.rm = TRUE)
+sum(is.na(plane))
+```
+
+```{r}
+sapply(plane,function(X) sum(is.na(X)))
+```
+
+```{r}
+plane$Gender= factor(plane$Gender,
+                     levels = c('Female','Male'),
+                     labels = c(0,1))
+```
+
+
+```{r}
+ggplot(plane, aes(Satisfaction)) + geom_bar()
+```
+
+```{r}
+table(plane$Satisfaction)
+```
+
+```{r}
+ggplot(plane, aes(x = Gender )) + geom_bar(aes(fill=Satisfaction), position = "dodge")
+
+```
+
+```{r}
+table(plane$Gender)
+```
+```{r}
+ggplot(plane, aes(x= Type_of_Travel)) + geom_bar(aes(fill=Satisfaction), position = "dodge")
+```
+
+```{r}
+ggplot(plane, aes(x= Class)) + geom_bar(aes(fill=Satisfaction),position = "dodge")                                                        
+```
+
+
+
+```{r}
+ggplot(plane,aes(Customer.Type,..count..)) + geom_bar(aes(fill=Satisfaction), position = "dodge")
+```
+
+```{r}
+ ggplot(plane, aes(x=Flight.Distance))+
+      geom_histogram(fill="#619cff")+
+  
+      labs(y="", x="flight distance")
+```
+
+
+```{r}
+ggplot(plane, aes(x=Departure.Delay))+
+                geom_histogram(fill="#619cff")+
+                xlim(0,250)+ylim(0,15000)+
+                labs(x="departure delay (mins)")
+```
+
+```{r}
+ggplot(plane, aes(x=Arrival.Delay))+
+  geom_histogram(fill="#619cff")+
+  xlim(0,250)+ylim(0,15000)+
+  labs(y="", x="arrival delay (mins)")
+
+```
+```{r}
+colnames(plane)
+```
+
+```{r}
+ggplot(plane, aes(x= Seat.Comfort,..count..)) + geom_bar(aes(fill= Satisfaction),position = "dodge")
+
+ggplot(plane, aes(x= Online.Boarding,..count..)) + geom_bar(aes(fill= Satisfaction),position = "dodge")
+
+ggplot(plane, aes(x= Cleanliness,..count..)) + geom_bar(aes(fill= Satisfaction),position = "dodge")
+
+ggplot(plane, aes(x= In.flight.Entertainment,..count..)) + geom_bar(aes(fill= Satisfaction),position = "dodge")
+
+ggplot(plane, aes(x= Check.in.Service,..count..)) + geom_bar(aes(fill= Satisfaction),position = "dodge")
+
+```
+
+
+
+```{r}
+df_test<-plane
+df_test$Satisfaction<-dplyr::recode(plane$Satisfaction, 'neutral or dissatisfied' = 0, 'satisfied' = 1)
+num_df<-df_test %>% select_if(is.numeric)
+cor_matrix<-cor(num_df)
+
+ggcorrplot(cor_matrix)+
+  theme_classic()+ scale_x_discrete(expand=c(0,0)) +
+ scale_y_discrete(expand=c(0,0)) 
+```
+
+
+```{r}
+correl <- corr_coef(plane,width_greater_than(9))
+plot(correl)
+```
+
+```{r}
+corr_plot(plane)
+```
+
+```{r}
+install.packages("corrplot")
+```
+
+
+
+```{r}
+inspect(plane,Arrival.Delay, Departure.Delay, plot = TRUE )
+```
+
+```{r}
+find_outliers(plane, Arrival.Delay, plots = TRUE)
+```
+
+```{r}
+corrplot(cor(plane), addCoef.col = 'white',
+number.cex = 0.8,
+number.digits = 1,
+diag = FALSE,
+bg = 'grey',
+outline = "black",
+addgrid.col = "white",
+mar = c(1,1,1,1))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                Insights
+                    Increasing a Wifi quality
+                    On-board service
+                    Online boarding
+                    marketing to the Business segment
